@@ -17,5 +17,6 @@ specification =
 ## Semantics
 
 A specification contains zero or more definitions.
-A [[Model Definition|modelDefs]] is needed to step a TorXakis model.
-A [[Model Definition|modelDefs]] and [[Connection Definition|cnectDefs]] are minimally needed to test a SUT or simulate a system using a TorXakis model.
+To step a specification at least a [[Model Definition|modelDefs]] is needed.
+To test a SUT at least a [[Model Definition|modelDefs]] and [[Connection Definition|cnectDefs]] are needed.
+To simulate a system at least a [[Model Definition|modelDefs]] and [[Connection Definition|cnectDefs]] are needed.
