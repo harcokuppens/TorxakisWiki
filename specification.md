@@ -2,16 +2,7 @@
 
 ## Syntax
 
-specification = 
-( [[modelDefs]]
- &#124; [[cnectDefs]]
- &#124; [[chanDefs]]
- &#124; [[typeDefs]]
- &#124; [[constDefs]]
- &#124; [[funcDefs]]
- &#124; [[procDefs]]
- &#124; [[stautDefs]]
-) *
+specification ::= ([[modelDefs]] &#124; [[cnectDefs]] &#124; [[chanDefs]] &#124; [[typeDefs]] &#124; [[constDefs]] &#124; [[funcDefs]] &#124; [[procDefs]] &#124; [[stautDefs]])*
 
 
 ## Semantics
