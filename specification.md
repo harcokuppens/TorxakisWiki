@@ -1,21 +1,21 @@
-h1. Language Definition
+# Language Definition
 
-h2. Syntax
+## Syntax
 
-|specification
-|( [[modelDefs]]
+specification = 
+( [[modelDefs]]
  &#124; [[cnectDefs]]
  &#124; [[chanDefs]]
  &#124; [[typeDefs]]
  &#124; [[constDefs]]
  &#124; [[funcDefs]]
  &#124; [[procDefs]]
- &#124; [[stautDef]]
+ &#124; [[stautDefs]]
 ) *
-|
 
-h2. Semantics
+
+## Semantics
 
 A specification contains zero or more definitions.
-A [[modelDefs|Model Definition]] is needed to step a TorXakis model.
-A [[modelDefs|Model Definition]] and [[cnectDefs|Connection Definition]] are minimally needed to test a SUT or simulate a system using a TorXakis model.
+A [[Model Definition|modelDefs]] is needed to step a TorXakis model.
+A [[Model Definition|modelDefs]] and [[Connection Definition|cnectDefs]] are minimally needed to test a SUT or simulate a system using a TorXakis model.
