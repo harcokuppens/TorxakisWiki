@@ -1,6 +1,6 @@
 # Welcome to the TorXakis wiki!
 
-TorXakis uses a specification to test a System-Under-Test (SUT) or simulate a System.
+TorXakis uses a [[specification]] to test a System-Under-Test (SUT) or simulate a System.
 A TorXakis specification contains three parts: 
 * Model - Composition of processes instances that models the behavior of the SUT
 * Adapter - Map abstract specification on actual SUT interfaces.
