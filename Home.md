@@ -1,7 +1,5 @@
 # Welcome to the TorXakis wiki!
 
-![TorXakis in action!](torxakis.luckypeople.gif)
-
 TorXakis uses a [[specification]] to test a System-Under-Test (SUT) or simulate a System.
 A TorXakis specification contains three parts: 
 * Model - Composition of processes instances that models the behavior of the SUT
@@ -12,3 +10,5 @@ TorXakis uses the Input-Output Conformance (IOCO) theory to
 check the actual against the specified externally observable behaviour.
 
 TorXakis is a command line tool that takes zero or more specification files as input.
+
+![TorXakis in action!](https://github.com/TorXakis/TorXakis/wiki/torxakis.luckypeople.gif)
