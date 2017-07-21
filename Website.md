@@ -2,4 +2,4 @@
 
 # Website[¶](#Website)
 
-The official TorXakis website is available at [http://torxakis.com](http://torxakis.com).
+The official TorXakis website is available at [http://torxakis.org](http://torxakis.org).
