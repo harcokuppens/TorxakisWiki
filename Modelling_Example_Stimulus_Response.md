@@ -1,163 +1,161 @@
-<a name="Modelling-Example-Stimulus-Response"></a>
-
-# Modelling Example Stimulus Response[¶](#Modelling-Example-Stimulus-Response)
-
-<a name="System-Under-Test"></a>
-
-## System Under Test[¶](#System-Under-Test)
-
-We want to test our [java program](Java_program) 'StimulusResponse.java'  
-
-    /**********************************************************************************************
-     Communication via stream-mode socket;
-     *********************************************************************************************/
-    import java.net.*;
-    import java.io.*;
-    import java.util.concurrent.*;
-
-    public class StimulusResponse
-    {
-        public static void main(String[] args)
-        {  
-            try
-            {
-                // instantiate a socket for accepting a connection
-                ServerSocket servsock = new ServerSocket(7890);
-
-                // wait to accept a connection request and a data socket is returned
-                Socket sock = servsock.accept();
-
-                // get an input stream for reading from the data socket
-                InputStream inStream = sock.getInputStream();
-
-                // create a BufferedReader object for text line input
-                BufferedReader sockin = new BufferedReader(new InputStreamReader(inStream));
-
-                // get an output stream for writing to the data socket
-                OutputStream outStream = sock.getOutputStream();
-
-                // create a PrinterWriter object for character-mode output
-                PrintWriter sockout = new PrintWriter(new OutputStreamWriter(outStream));
-
-                // read a line from the data stream: the stimulus
-                sockin.readLine();
-                // send a line to the data stream: the response
-                sockout.print("\n");
-                sockout.flush();
-
-                // TorXakis targets embedded systems and servers that typically don't terminate
-                TimeUnit.SECONDS.sleep(10);
-            }
-            catch (Exception ex) { ex.printStackTrace(); }
-        }
-    }
-
-As described in the code above, our System Under Test (SUT) communicates with the outside world by sending and receiving lines, i.e., strings terminated by a line feed, over a socket at port 7890.  
-When TorXakis and the SUT will run on the same machine, i.e., localhost, the [SUT Definition](SUTDEF.html) in TorXakis is as follows:  
-
-<pre>SUTDEF Sut ::=
-    SUT IN     In  :: String
-    SUT OUT    Out :: String
-
-    SOCK IN    In   HOST "localhost"  PORT 7890
-    SOCK OUT   Out  HOST "localhost"  PORT 7890
+# Modelling Example: Stimulus Response
+We want to test our [java program](Java_program) [StimulusResponse.java](https://github.com/TorXakis/TorXakis/blob/develop/examps/stimulusresponse/StimulusResponse.java).
+This is a simple program that receives an input (Stimulus) and responds to it (Response).
+All the files used in this example can be found at [the example folder](https://github.com/TorXakis/TorXakis/tree/develop/examps/stimulusresponse).
+## Channels
+This program (our System Under Test - SUT) receives a stimulus and responds to it. Let's [define the channels](ChanDefs) needed for modelling this behaviour:
+```
+CHANDEF  Chans ::=  Stimulus; Response
 ENDDEF
-</pre>
-
-<a name="Specification"></a>
-
-## Specification[¶](#Specification)
-
-We specify that the system has two channels, one incoming for the stimulus and one outgoing for the response.  
-Furthermore, we specify that first a stimulus and then a response are communicated.  
-The [Specification Definition](SpecDefs.html) in TorXakis is as follows:  
-
-<pre>SPECDEF Spec ::=
+```
+## Model
+The model should specify that the system uses two channels, one incoming for the stimulus and one outgoing for the response.
+It should also specify that first a stimulus and then a response are communicated.
+The [Model Definition](ModelDefs) of this system in TorXakis is as follows:
+```
+MODELDEF Model ::=
     CHAN IN    Stimulus
     CHAN OUT   Response
 
     BEHAVIOUR  
         Stimulus >-> Response
 ENDDEF
-</pre>
+```
+## SUT Connection
+Our SUT communicates with the outside world by sending and receiving lines i.e. strings terminated by a line feed, over a socket at port 7890.
+When TorXakis and the SUT run on the same machine (localhost) the [SUT connection](CnectDefs) can be defined in TorXakis as follows:
+```
+CNECTDEF  Sut ::=
+    CLIENTSOCK
 
-<a name="Adapter"></a>
-
-## Adapter[¶](#Adapter)
-
-To match the specification with the System Under Test, we define the following adapter:  
-
-<pre>ADAPDEF Adap ::=
-    CHAN IN    Stimulus    SUT IN    In  :: String
-    CHAN OUT   Response    SUT OUT   Out :: String
-
-    MAP IN     Stimulus    ->   In ! "" 
-    MAP OUT    Out ? s     ->   Response
+    CHAN  OUT  Stimulus            HOST "localhost"  PORT 7890
+    ENCODE     Stimulus            ->  ! ""
+    
+    CHAN  IN   Response            HOST "localhost"  PORT 7890
+    DECODE     Response            <-   ? s
 ENDDEF
-</pre>
+```
+## Model Based Testing
+1.  Start the SUT: run the [Java program](Java_program) in a command window.
 
-<a name="Model-Based-Testing"></a>
+`$> java StimulusResponse`
 
-## Model Based Testing[¶](#Model-Based-Testing)
+2.  Start TorXakis: run the [TorXakis](TorXakis) with the StimulusResponse model describe above in another command window.
 
-1.  Start the SUT: run the [Java program](Java_program) in a command window.  
+`$> torxakis StimulusResponse.txs`
 
-    <pre> java StimulusResponse
-    </pre>
+3.  Set the Model and SUT for testing: In TorXakis type the following commands:
 
-2.  Start TorXakis: run the [TorXakis](TorXakis) with the StimulusResponse model describe above in another command window.  
+`tester Model Sut`
 
-    <pre> torxakis StimulusResponse.txs
-    </pre>
+4.  Test the SUT: In TorXakis type the following command:
 
-3.  Set the Specification, Adapter, and SUT: In TorXakis type the following commands  
+`test 3`
 
-    <pre> spec Spec
-     adap Adap
-     sut Sut
-    </pre>
+TorXakis will perform the two communication actions, Stimulus and Response,
+observe that the system under test communicates no additional output until
+TorXakis times out (as expected), and finally conclude:
+```
+TXS >>  .....1: IN: Act { { ( Stimulus, [] ) } }
+TXS >>  .....2: OUT: Act { { ( Response, [] ) } }
+TXS >>  .....3: OUT: No Output (Quiescence)
+TXS >>  PASS
+```
+### Errorneous SUT
+1.  Start the errorneous SUT: run the errorneous [Java program](Java_program) 'StimulusNoResponse.java' in a command window.
 
-4.  Test the SUT: In TorXakis type the following command  
+`$> java StimulusNoResponse`
 
-    <pre> test 3
-    </pre>
+2.  Start TorXakis: run the [TorXakis](TorXakis) with the StimulusResponse model describe above in another command window.
 
-    TorXakis will perform the two communication actions, Stimulus and Response,  
-    observe that the system under test communicates no additional output,  
-    and finally conclude  
+`$> torxakis StimulusResponse.txs`
 
-    <pre> PASS
-    </pre>
+3.  Set the Model and SUT for testing: In TorXakis type the following commands
 
-<a name="Errorneous-SUT"></a>
+`tester Model Sut`
 
-### Errorneous SUT[¶](#Errorneous-SUT)
+4.  Test the erroneous SUT: In TorXakis type the following command:
 
-1.  Start the errorneous SUT: run the errorneous [Java program](Java_program) 'StimulusNoResponse.java' in a command window.  
+`test 3`
 
-    <pre> java StimulusNoResponse
-    </pre>
+TorXakis will perform the first communication action: Stimulus.
+TorXakis will observe that the expected second communication action (Response) doesn't occur,
+causing the step to time out, so conclude:
+```
+TXS >>  .....1: IN: Act { { ( Stimulus, [] ) } }
+TXS >>  .....2: OUT: No Output (Quiescence)
+TXS >>  Expected:
+TXS >>  [ ( { Response[] }, [], [] ) ]
+TXS >>  FAIL: No Output (Quiescence)
+```
+# Stimulus Response - Loop
+Let's change our system to run in a loop of waiting for next Stimulus, instead of exiting after the first one. See [StimulusResponseLoop.java](https://github.com/TorXakis/TorXakis/blob/develop/examps/stimulusresponse/StimulusResponseLoop.java) for the updated Java code.
 
-2.  Start TorXakis: run the [TorXakis](TorXakis) with the StimulusResponse model describe above in another command window.  
+Our [channel definitions](ChanDefs) don't change:
+```
+CHANDEF Model ::=   Stimulus, Response
+ENDDEF
+```
+Our [SUT connection](CnectDefs) stays the same, too:
+```
+CNECTDEF  Sut ::=
+    CLIENTSOCK
 
-    <pre> torxakis StimulusResponse.txs
-    </pre>
+    CHAN  OUT  Stimulus            HOST "localhost"  PORT 7890
+    ENCODE     Stimulus            ->  ! ""
+    
+    CHAN  IN   Response            HOST "localhost"  PORT 7890
+    DECODE     Response            <-   ? s
+ENDDEF
+```
+In our [model definition](ModelDefs), we need a way to define the looping behaviour. We can make use of a recursive [procedure definition](ProcDefs) for this:
+```
+PROCDEF stimResp [ Stimulus, Response ] () 
+    ::=
+        Stimulus  >->  Response  >->  stimResp [Stimulus,Response] ()
+ENDDEF
+```
+Now we can use this [procedure definition](ProcDefs) in our [Model](ModelDefs):
+```
+MODELDEF Model ::=
+    CHAN IN    Stimulus
+    CHAN OUT   Response
 
-3.  Set the Specification, Adapter, and SUT: In TorXakis type the following commands  
+    BEHAVIOUR  
+        stimResp [Stimulus,Response] ()
+ENDDEF
+```
+Now we can run model based tests on test our new SUT:
+1.  Start the SUT: run the [Java program](Java_program) in a command window.
 
-    <pre> spec Spec
-     adap Adap
-     sut Sut
-    </pre>
+`$> java StimulusResponseLoop`
 
-4.  Test the erroneous SUT: In TorXakis type the following command  
+2.  Start TorXakis: run the [TorXakis](TorXakis) with the StimulusResponse model describe above in another command window.
 
-    <pre> test 3
-    </pre>
+`$> torxakis StimulusResponseLoop.txs`
 
-    TorXakis will perform the first communication action: Stimulus.  
-    TorXakis will observe that the expected second communication action, Response, doesn't occur,  
-    and conclude  
+3.  Set the Model and SUT for testing: In TorXakis type the following commands:
 
-    <pre> FAIL
-    </pre>
+`tester Model Sut`
+
+4.  Test the SUT: In TorXakis type the following command:
+
+`test 10`
+
+TorXakis will perform the two communication actions, Stimulus and Response,
+over and over again for as many test steps as we tell it to (in this example: 10).
+Observing that SUT communicates a Response for every Stimulus as expected,
+it will finally conclude:
+```
+TXS >>  .....1: IN: Act { { ( Stimulus, [] ) } }
+TXS >>  .....2: OUT: Act { { ( Response, [] ) } }
+TXS >>  .....3: IN: Act { { ( Stimulus, [] ) } }
+TXS >>  .....4: OUT: Act { { ( Response, [] ) } }
+TXS >>  .....5: IN: Act { { ( Stimulus, [] ) } }
+TXS >>  .....6: OUT: Act { { ( Response, [] ) } }
+TXS >>  .....7: IN: Act { { ( Stimulus, [] ) } }
+TXS >>  .....8: OUT: Act { { ( Response, [] ) } }
+TXS >>  .....9: IN: Act { { ( Stimulus, [] ) } }
+TXS >>  ....10: OUT: Act { { ( Response, [] ) } }
+TXS >>  PASS
+```
