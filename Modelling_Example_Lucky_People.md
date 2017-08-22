@@ -7,14 +7,14 @@ Your assignment is to test the Lucky People program with TorXakis.
 The Lucky People program gets as input a sequence of persons on socket 777.
 A person has a sex, first name, last name, day and month of birth.
 For each person, the Lucky People program produces one output, a string on socket 777.
-The string is either True or False, and reflect whether the person is considered lucky.
+The string is either True or False, and reflects whether the person is considered lucky.
 A person is lucky when either
 
 *   the first character of the first name is equal to the first character of the last name, or
 *   the day of birth is equal to the month of birth, or
 *   the person is a Female after five Males or a Male after five Females.
 
-The input sequence is specified as followed:
+The input sequence is specified as follows:
 
 <table>
 <tbody>
