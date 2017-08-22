@@ -15,65 +15,17 @@ A person is lucky when either
 *   the person is a Female after five Males or a Male after five Females.
 
 The input sequence is specified as follows:
-
-<table>
-<tbody>
-<tr>
-<td>persons</td>
-<td>(person '\n')*</td>
-<td></td>
-</tr>
-
-<tr>
-<td>person</td>
-<td>sex separator firstName separator lastName separator dayOfBirth separator monthOfBirth</td>
-<td></td>
-</tr>
-
-<tr>
-<td>separator</td>
-<td>'@'</td>
-<td></td>
-</tr>
-
-<tr>
-<td>sex</td>
-<td>'Male' | 'Female'</td>
-<td></td>
-</tr>
-
-<tr>
-<td>firstName</td>
-<td>name</td>
-<td></td>
-</tr>
-
-<tr>
-<td>lastName</td>
-<td>name</td>
-<td></td>
-</tr>
-
-<tr>
-<td>name</td>
-<td>[A-Z][a-z]*</td>
-<td></td>
-</tr>
-
-<tr>
-<td>dayOfBirth</td>
-<td>Int</td>
-<td>1 <= dayOfBirth <= 31</td>
-</tr>
-
-<tr>
-<td>monthOfBirth</td>
-<td>Int</td>
-<td>1 <= monthOfBirth <= 12</td>
-</tr>
-</tbody>
-</table>
-
+| Specification | Structure | Constraints |
+|-|-|-|
+| persons | (person '\n')* ||
+| person | sex separator firstName separator lastName separator dayOfBirth separator monthOfBirth ||
+| separator | '@' ||
+| sex | 'Male' | 'Female' ||
+| firstName | name ||
+| lastName | name ||
+| name | [A-Z][a-z]* ||
+| dayOfBirth | Int | 1 <= dayOfBirth <= 31 |
+| monthOfBirth | Int | 1 <= monthOfBirth <= 12 |
 ## Examples
 
 ### Lucky based on names
@@ -114,4 +66,4 @@ Provide a test report: a file containing the verdict whether 'LuckyPeople.java' 
 
 ## Solution
 
-You can find the solution [here](Modelling_Example_Lucky_People_Solution).
+You can find a solution [here](Modelling-Example-Lucky-People-(Solution)).
