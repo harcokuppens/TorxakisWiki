@@ -17,7 +17,7 @@ MODELDEF Model ::=
     CHAN IN    Stimulus
     CHAN OUT   Response
 
-    BEHAVIOUR  
+    BEHAVIOUR
         Stimulus >-> Response
 ENDDEF
 ```
@@ -30,7 +30,7 @@ CNECTDEF  Sut ::=
 
     CHAN  OUT  Stimulus            HOST "localhost"  PORT 7890
     ENCODE     Stimulus            ->  ! ""
-    
+
     CHAN  IN   Response            HOST "localhost"  PORT 7890
     DECODE     Response            <-   ? s
 ENDDEF
@@ -103,14 +103,14 @@ CNECTDEF  Sut ::=
 
     CHAN  OUT  Stimulus            HOST "localhost"  PORT 7890
     ENCODE     Stimulus            ->  ! ""
-    
+
     CHAN  IN   Response            HOST "localhost"  PORT 7890
     DECODE     Response            <-   ? s
 ENDDEF
 ```
 In our [model definition](ModelDefs), we need a way to define the looping behaviour. We can make use of a recursive [procedure definition](ProcDefs) for this:
 ```
-PROCDEF stimResp [ Stimulus, Response ] () 
+PROCDEF stimResp [ Stimulus, Response ] ()
     ::=
         Stimulus  >->  Response  >->  stimResp [Stimulus,Response] ()
 ENDDEF
@@ -121,7 +121,7 @@ MODELDEF Model ::=
     CHAN IN    Stimulus
     CHAN OUT   Response
 
-    BEHAVIOUR  
+    BEHAVIOUR
         stimResp [Stimulus,Response] ()
 ENDDEF
 ```
