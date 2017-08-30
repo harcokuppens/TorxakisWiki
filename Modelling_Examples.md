@@ -8,7 +8,7 @@ Please consult the [java program section](Java_program) for instruction on worki
 Modelling Examples in order of increasing complexity
 
 *   [Modelling Example - Stimulus Response](Modelling_Example_Stimulus_Response)
-*   [Modelling Example - Shared Memory](Modelling_Example_Shared_Memory)
+*   [Modelling Example - Shared Memory](Modelling-Example-Shared-Memory)
 *   [Modelling Example - Control Loop](Modelling_Example_Control_Loop)
 *   [Modelling Example - Customers Orders](Modelling_Example_Customers_Orders)
 *   [Modelling Example - Lucky People](Modelling-Example-Lucky-People)
