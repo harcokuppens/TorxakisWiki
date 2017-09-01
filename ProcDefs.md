@@ -95,7 +95,7 @@
 <td>exitDecl  
 </td>
 
-<td>"EXIT" ("::" neTypeNameList)?  
+<td>"EXIT" neTypeNameList?  
 </td>
 
 </tr>
