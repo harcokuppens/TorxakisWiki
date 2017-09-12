@@ -105,7 +105,7 @@ ENDDEF
 ```
 
 ## SUT Connection
-Our SUT communicates with the outside world by sending and receiving lines i.e. strings terminated by a line feed, over a socket at port 777.
+Our SUT communicates with the outside world by sending and receiving lines i.e. strings terminated by a line feed, over a socket at port 7777.
 The SUT also expects one person per input line, fields separated by "@" sign. So we should make sure that the Person type in our TorXakis model is properly serialized before being communicated to the SUT. The return value from the SUT should also be deserialized into proper data structure (Bool).
 Assuming that TorXakis and the SUT run on the same machine (localhost) the [SUT connection](CnectDefs) can be defined in TorXakis as follows:
 ```
@@ -114,14 +114,14 @@ CONSTDEF separator :: String ::= "@" ENDDEF
 CNECTDEF  Sut ::=
     CLIENTSOCK
 
-    CHAN  OUT  In                   HOST "localhost"  PORT 777
+    CHAN  OUT  In                   HOST "localhost"  PORT 7777
     ENCODE     In  ? p              ->  ! toString(sex(p))        ++ separator ++
                                           firstName(p)            ++ separator ++
                                           lastName(p)             ++ separator ++
                                           toString(dayOfBirth(p)) ++ separator ++
                                           toString(monthOfBirth(p))
 
-    CHAN  IN   Out                  HOST "localhost"  PORT 777
+    CHAN  IN   Out                  HOST "localhost"  PORT 7777
     DECODE     Out  ! fromString(s) <-  ? s
 ENDDEF
 
@@ -157,10 +157,10 @@ TXS >>  ....50: OUT: Act { { ( Out, [ False ] ) } }
 TXS >>  PASS
 ```
 ### Testing with predetermined input
-We can also tell TorXakis to use predetermined input data for testing. For this, we'll define a process that communicates Person data and resulting boolean at each step, then we'll add as many steps as we want for our predetermined input.
+We can also tell TorXakis to use predetermined input data for testing. For this, we can make use of [Test Purpose](TestPurpose)s. We'll define a process that communicates Person data and resulting boolean at each step, then we'll add as many steps as we want for our predetermined input, and then we'll use this process in our Test Purpose.
 Let's define that process and write some test data with expected results:
 ```
-PROCDEF examples [ In :: Person; Out :: Bool ] () ::=
+PROCDEF examples [ In :: Person; Out :: Bool ] () HIT ::=
         In ! Person( Male, "Mickey", "Mouse", 13, 1 )
     >-> Out ! True
     >-> In ! Person( Male, "Donald", "Duck", 13, 3 )
@@ -199,22 +199,20 @@ PROCDEF examples [ In :: Person; Out :: Bool ] () ::=
     >-> Out ! True
 ENDDEF
 ```
-Now we should make sure the input of our model is synchronized with what this process communicates to the channels. Let's define another model for this:
+Mind the **HIT** keyword on first line. This keyword is necessary in order to use it as a **Goal** in the Test Purpose definition below.
+
+Now we should make sure the generated input for our SUT is synchronized with what this process communicates to the channels. Let's define the Test Purpose for this:
 ```
-MODELDEF ModelExamples ::=
+PURPDEF PurposeExamples ::=
     CHAN IN    In 
     CHAN OUT   Out
     
-    BEHAVIOUR  
-            luckyPeople[In, Out](Male,0)   
-        |[In,Out]|
-            examples[In,Out]()
+    GOAL examples ::= examples [In,Out] ()
 ENDDEF
 ```
-"*|[...]|*" is the [Synchronized Channels Operator](Synchronized_Channels_Operator). The processes on two sides of this operator are executed while synchronized over the channels between brackets.
-The line with [Synchronized Channels Operator](Synchronized_Channels_Operator) effectively forces the Person's in *examples* process to be communicated through *In* channel to *ModelExamples* model and expects the output in *Out* channel to match whatever is defined in *examples* process.
+Defining the Goal of the Test Purpose with *examples* process effectively forces the Persons in *examples* process to be communicated through *In* channel to *Model* and expects the output in *Out* channel to match whatever is defined in *examples* process.
 
-Now we can use this new model to test SUT with our predetermined inputs.
+Now we can use this Test Purpose to test SUT with our predetermined inputs.
 
 1.  Start the SUT: run the [Java program](Java_program) in a command window.
 
@@ -226,51 +224,192 @@ Now we can use this new model to test SUT with our predetermined inputs.
 
 3.  Set the Model and SUT for testing: In TorXakis type the following commands:
 
-`tester ModelExamples Sut`
+`tester Model PurposeExamples Sut`
 
-4.  Test the SUT with predetermined inputs. We have 18 persons, which means we need 36 steps. In TorXakis type the following command:
+4.  Test the SUT with predetermined inputs. We have 18 persons, which means we need 36 steps. But TorXakis occasionally adds some Quiescence steps in between, so let's run TorXakis for 50 steps instead. In TorXakis type the following command:
 
-`test 36`
+`test 50`
 
 ```
 TXS >>  .....1: IN: Act { { ( In, [ Person(Male,"Mickey","Mouse",13,1) ] ) } }
 TXS >>  .....2: OUT: Act { { ( Out, [ True ] ) } }
-TXS >>  .....3: IN: Act { { ( In, [ Person(Male,"Donald","Duck",13,3) ] ) } }
-TXS >>  .....4: OUT: Act { { ( Out, [ True ] ) } }
-TXS >>  .....5: IN: Act { { ( In, [ Person(Male,"Luuk","Laar",24,12) ] ) } }
-TXS >>  .....6: OUT: Act { { ( Out, [ True ] ) } }
-TXS >>  .....7: IN: Act { { ( In, [ Person(Female,"Shakira","Ripoll",2,2) ] ) } }
+TXS >>  .....3: OUT: No Output (Quiescence)
+TXS >>  .....4: IN: Act { { ( In, [ Person(Male,"Donald","Duck",13,3) ] ) } }
+TXS >>  .....5: OUT: Act { { ( Out, [ True ] ) } }
+TXS >>  .....6: OUT: No Output (Quiescence)
+TXS >>  .....7: IN: Act { { ( In, [ Person(Male,"Luuk","Laar",24,12) ] ) } }
 TXS >>  .....8: OUT: Act { { ( Out, [ True ] ) } }
-TXS >>  .....9: IN: Act { { ( In, [ Person(Male,"Michael","Buble",9,9) ] ) } }
-TXS >>  ....10: OUT: Act { { ( Out, [ True ] ) } }
-TXS >>  ....11: IN: Act { { ( In, [ Person(Female,"Imke","Laar",7,7) ] ) } }
-TXS >>  ....12: OUT: Act { { ( Out, [ True ] ) } }
-TXS >>  ....13: IN: Act { { ( In, [ Person(Male,"Huey","Duck",17,10) ] ) } }
-TXS >>  ....14: OUT: Act { { ( Out, [ False ] ) } }
-TXS >>  ....15: IN: Act { { ( In, [ Person(Male,"Dewey","Duck",17,10) ] ) } }
+TXS >>  .....9: OUT: No Output (Quiescence)
+TXS >>  ....10: IN: Act { { ( In, [ Person(Female,"Shakira","Ripoll",2,2) ] ) } }
+TXS >>  ....11: OUT: Act { { ( Out, [ True ] ) } }
+TXS >>  ....12: OUT: No Output (Quiescence)
+TXS >>  ....13: IN: Act { { ( In, [ Person(Male,"Michael","Buble",9,9) ] ) } }
+TXS >>  ....14: OUT: Act { { ( Out, [ True ] ) } }
+TXS >>  ....15: IN: Act { { ( In, [ Person(Female,"Imke","Laar",7,7) ] ) } }
 TXS >>  ....16: OUT: Act { { ( Out, [ True ] ) } }
-TXS >>  ....17: IN: Act { { ( In, [ Person(Male,"Louie","Duck",17,10) ] ) } }
-TXS >>  ....18: OUT: Act { { ( Out, [ False ] ) } }
-TXS >>  ....19: IN: Act { { ( In, [ Person(Male,"Mickey","Mouse",13,1) ] ) } }
-TXS >>  ....20: OUT: Act { { ( Out, [ True ] ) } }
-TXS >>  ....21: IN: Act { { ( In, [ Person(Male,"Donald","Duck",13,3) ] ) } }
+TXS >>  ....17: OUT: No Output (Quiescence)
+TXS >>  ....18: IN: Act { { ( In, [ Person(Male,"Huey","Duck",17,10) ] ) } }
+TXS >>  ....19: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ....20: OUT: No Output (Quiescence)
+TXS >>  ....21: IN: Act { { ( In, [ Person(Male,"Dewey","Duck",17,10) ] ) } }
 TXS >>  ....22: OUT: Act { { ( Out, [ True ] ) } }
-TXS >>  ....23: IN: Act { { ( In, [ Person(Female,"April","Duck",15,5) ] ) } }
-TXS >>  ....24: OUT: Act { { ( Out, [ True ] ) } }
-TXS >>  ....25: IN: Act { { ( In, [ Person(Female,"Beatrix","Oranje",31,1) ] ) } }
-TXS >>  ....26: OUT: Act { { ( Out, [ False ] ) } }
-TXS >>  ....27: IN: Act { { ( In, [ Person(Female,"Maxima","Zorreguieta",17,5) ] ) } }
-TXS >>  ....28: OUT: Act { { ( Out, [ False ] ) } }
-TXS >>  ....29: IN: Act { { ( In, [ Person(Female,"Amalia","Oranje",7,12) ] ) } }
-TXS >>  ....30: OUT: Act { { ( Out, [ False ] ) } }
-TXS >>  ....31: IN: Act { { ( In, [ Person(Female,"Alexia","Oranje",26,6) ] ) } }
-TXS >>  ....32: OUT: Act { { ( Out, [ False ] ) } }
-TXS >>  ....33: IN: Act { { ( In, [ Person(Female,"Ariane","Oranje",10,4) ] ) } }
+TXS >>  ....23: IN: Act { { ( In, [ Person(Male,"Louie","Duck",17,10) ] ) } }
+TXS >>  ....24: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ....25: OUT: No Output (Quiescence)
+TXS >>  ....26: IN: Act { { ( In, [ Person(Male,"Mickey","Mouse",13,1) ] ) } }
+TXS >>  ....27: OUT: Act { { ( Out, [ True ] ) } }
+TXS >>  ....28: OUT: No Output (Quiescence)
+TXS >>  ....29: IN: Act { { ( In, [ Person(Male,"Donald","Duck",13,3) ] ) } }
+TXS >>  ....30: OUT: Act { { ( Out, [ True ] ) } }
+TXS >>  ....31: IN: Act { { ( In, [ Person(Female,"April","Duck",15,5) ] ) } }
+TXS >>  ....32: OUT: Act { { ( Out, [ True ] ) } }
+TXS >>  ....33: IN: Act { { ( In, [ Person(Female,"Beatrix","Oranje",31,1) ] ) } }
 TXS >>  ....34: OUT: Act { { ( Out, [ False ] ) } }
-TXS >>  ....35: IN: Act { { ( In, [ Person(Male,"Willem","Oranje",27,4) ] ) } }
-TXS >>  ....36: OUT: Act { { ( Out, [ True ] ) } }
+TXS >>  ....35: OUT: No Output (Quiescence)
+TXS >>  ....36: IN: Act { { ( In, [ Person(Female,"Maxima","Zorreguieta",17,5) ] ) } }
+TXS >>  ....37: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ....38: OUT: No Output (Quiescence)
+TXS >>  ....39: IN: Act { { ( In, [ Person(Female,"Amalia","Oranje",7,12) ] ) } }
+TXS >>  ....40: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ....41: OUT: No Output (Quiescence)
+TXS >>  ....42: IN: Act { { ( In, [ Person(Female,"Alexia","Oranje",26,6) ] ) } }
+TXS >>  ....43: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ....44: IN: Act { { ( In, [ Person(Female,"Ariane","Oranje",10,4) ] ) } }
+TXS >>  ....45: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ....46: IN: Act { { ( In, [ Person(Male,"Willem","Oranje",27,4) ] ) } }
+TXS >>  ....47: OUT: Act { { ( Out, [ True ] ) } }
+TXS >>  ....48: OUT: No Output (Quiescence)
+TXS >>  Goal examples: Hit
 TXS >>  PASS
 ```
+### Lucky based on gender
+One of the situations that makes a person lucky is when that person's sex is different from previous 5 people. Even though our predetermined inputs cover this case, this criteria comes with implied cases that:
+
+- if _less than 5_ previous persons are of the other sex then the current person **is not lucky**
+- if _more than 5_ previous persons are of the other sex then the current person **is lucky**
+
+Covering all these cases with predetermined input is not only not practical but also defeats the purpose of using TorXakis for Model Based Testing. We should make TorXakis to test these situations while still generating test data randomly. We can do it by using a Test Purpose that only enforces the sex of generated Person data and leaves the rest to be generated by TorXakis.
+
+Here is such a [Process Definition](ProcDefs) that can be used here:
+```
+PROCDEF increasingRows [ In :: Person; Out :: Bool ] ( length, pos :: Int; s :: Sex ) HIT ::=
+        In ? p [[ sex(p) == s]]
+    >-> Out ? b
+    >-> (
+                [[pos == 1]] =>> (
+                                        [[ isMale(s) ]] =>> increasingRows [In,Out] (length, length, Female)
+                                    ##
+                                        [[ isFemale(s) ]] =>> increasingRows [In,Out] (length+1, length+1, Male)
+                                 )
+            ##
+                [[pos>1]] =>> increasingRows [In,Out] (length, pos-1, s)
+         )
+ENDDEF
+```
+This process enforces repeating the same sex for a number of times, for both sexes, then increments the repetition number and repeats. There's no upper limit defined for the repetition number, so as long as we run TorXakis the generated persons' sexes will be like this: *MFMMFFMMMFFFMMMMFFFF*...
+
+Let's write a Test Purpose that uses *incresingRows* process to manipulate test data generated by TorXakis:
+```
+PURPDEF PurposeIncreasingRows ::=
+    CHAN IN    In 
+    CHAN OUT   Out
+    
+    GOAL increasingRows ::= increasingRows [In,Out] (1,1,Male)
+ENDDEF
+```
+Now we can use this Test Purpose to test SUT for various "Lucky by gender" cases.
+
+1.  Start the SUT: run the [Java program](Java_program) in a command window.
+
+`$> java LuckyPeople`
+
+2.  Start TorXakis: run the [TorXakis](TorXakis) with the LuckyPeople model described above in another command window.
+
+`$> torxakis LuckyPeople.txs`
+
+3.  Set the Model and SUT for testing: In TorXakis type the following commands:
+
+`tester Model PurposeIncreasingRows Sut`
+
+4.  Test the SUT with random data, ensuring coverage of "Lucky by gender" cases. Let's say we test for repetitions of 1 to 10 i.e.:
+
+- Female after 1 Male
+- Male after 1 Female
+- Female after 2 Males
+- Male after 2 Females
+
+...
+
+- Female after 9 Males
+- Male after 9 Females
+- Female after 10 Males
+- Male after 10 Females
+
+This means we have (10*11)/2=55 cases for each gender, 2 steps (In, Out) per case means 110 steps and for both genders including last switch from 10F-to-M **221 steps** in total. But TorXakis occasionally adds some Quiescence steps in between, so let's run TorXakis for 300 steps instead. In TorXakis type the following command:
+
+`test 300`
+
+```
+TXS >>  .....1: OUT: No Output (Quiescence)
+TXS >>  .....2: IN: Act { { ( In, [ Person(Male,"Ac","Arv",13,5) ] ) } }
+TXS >>  .....3: OUT: Act { { ( Out, [ True ] ) } }
+TXS >>  .....4: OUT: No Output (Quiescence)
+TXS >>  .....5: IN: Act { { ( In, [ Person(Female,"B","D",19,7) ] ) } }
+TXS >>  .....6: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  .....7: OUT: No Output (Quiescence)
+TXS >>  .....8: IN: Act { { ( In, [ Person(Male,"D","H",29,7) ] ) } }
+TXS >>  .....9: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ....10: OUT: No Output (Quiescence)
+TXS >>  ....11: IN: Act { { ( In, [ Person(Male,"F","O",30,1) ] ) } }
+TXS >>  ....12: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ....13: OUT: No Output (Quiescence)
+TXS >>  ....14: IN: Act { { ( In, [ Person(Female,"A","D",2,3) ] ) } }
+TXS >>  ....15: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ....16: OUT: No Output (Quiescence)
+TXS >>  ....17: IN: Act { { ( In, [ Person(Female,"C","Pxd",3,12) ] ) } }
+TXS >>  ....18: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ....19: OUT: No Output (Quiescence)
+...
+TXS >>  ...255: IN: Act { { ( In, [ Person(Male,"T","B",31,10) ] ) } }
+TXS >>  ...256: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ...257: IN: Act { { ( In, [ Person(Female,"B","D",29,8) ] ) } }
+TXS >>  ...258: OUT: Act { { ( Out, [ True ] ) } }
+TXS >>  ...259: IN: Act { { ( In, [ Person(Female,"Yj","L",31,2) ] ) } }
+TXS >>  ...260: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ...261: IN: Act { { ( In, [ Person(Female,"N","H",9,11) ] ) } }
+TXS >>  ...262: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ...263: IN: Act { { ( In, [ Person(Female,"Pdp","A",5,7) ] ) } }
+TXS >>  ...264: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ...265: IN: Act { { ( In, [ Person(Female,"Lh","H",30,11) ] ) } }
+TXS >>  ...266: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ...267: IN: Act { { ( In, [ Person(Female,"Z","P",31,10) ] ) } }
+TXS >>  ...268: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ...269: OUT: No Output (Quiescence)
+TXS >>  ...270: IN: Act { { ( In, [ Person(Female,"V","C",18,9) ] ) } }
+TXS >>  ...271: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ...272: IN: Act { { ( In, [ Person(Female,"Hbx","H",30,1) ] ) } }
+TXS >>  ...273: OUT: Act { { ( Out, [ True ] ) } }
+TXS >>  ...274: IN: Act { { ( In, [ Person(Female,"D","K",18,1) ] ) } }
+TXS >>  ...275: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ...276: OUT: No Output (Quiescence)
+TXS >>  ...277: IN: Act { { ( In, [ Person(Female,"Wp","Pkx",29,12) ] ) } }
+TXS >>  ...278: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  ...279: OUT: No Output (Quiescence)
+TXS >>  ...280: IN: Act { { ( In, [ Person(Male,"G","Ahagpa",14,4) ] ) } }    <<== This is a Male after 10 Females
+TXS >>  ...281: OUT: Act { { ( Out, [ True ] ) } }                            <<== He's lucky based on gender
+TXS >>  ...282: OUT: No Output (Quiescence)
+TXS >>  ...283: IN: Act { { ( In, [ Person(Male,"F","A",30,8) ] ) } }
+TXS >>  ...284: OUT: Act { { ( Out, [ False ] ) } }
+...
+TXS >>  ...299: IN: Act { { ( In, [ Person(Male,"M","P",23,6) ] ) } }
+TXS >>  ...300: OUT: Act { { ( Out, [ False ] ) } }
+TXS >>  PASS
+```
+Two points for attention:
+
+- In our **increasingRows** process we didn't have to tell TorXakis that after switching the gender the next person has to be lucky on unlucky; we just enforced a certain sex to be assigned to current person. TorXakis knows what each person's luckiness output should be depending on the **Model**.
+- Since we do not manipulate other data of persons, it is possible that a person which should be lucky based on gender is actually lucky due to some other condition. This does nullify our aim, but we ignore such cases for now. What we are sure about, though, is that a person who comes after 5+ people from the opposite gender is *always* lucky. On the other hand, it's possible to ensure that such people are *only* lucky by gender with a more complex *increasingRows* process.
+
 ## XML-Based communication
 TorXakis is capable of XML-based communication with SUT's. We don't have an SUT which does that but TorXakis can help us there, too: TorXakis can also act as a simulator which behaves based on a model.
 Let's [define another connection](CnectDefs) and a simulator, both of which use XML-based communication.
@@ -278,20 +417,20 @@ Let's [define another connection](CnectDefs) and a simulator, both of which use 
 CNECTDEF  Xut ::=
     CLIENTSOCK
 
-    CHAN  OUT  In                   HOST "localhost"  PORT 777
+    CHAN  OUT  In                   HOST "localhost"  PORT 7777
     ENCODE     In  ? p              ->  ! toXml(p)
     
-    CHAN  IN   Out                  HOST "localhost"  PORT 777
+    CHAN  IN   Out                  HOST "localhost"  PORT 7777
     DECODE     Out  ! fromXml(s)    <-  ? s
 ENDDEF
 
 CNECTDEF  Xim ::=
     SERVERSOCK
 
-    CHAN IN   In                    HOST "localhost"  PORT 777
+    CHAN IN   In                    HOST "localhost"  PORT 7777
     DECODE    In ! fromXml(s)       <-  ? s
 
-    CHAN OUT  Out                   HOST "localhost"  PORT 777
+    CHAN OUT  Out                   HOST "localhost"  PORT 7777
     ENCODE    Out ? b               ->  ! toXml(b)
 ENDDEF
 ```

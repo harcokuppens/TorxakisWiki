@@ -4,9 +4,9 @@ Your assignment is to test the Lucky People program with TorXakis.
 
 ## Requirements
 
-The Lucky People program gets as input a sequence of persons on socket 777.
+The Lucky People program gets as input a sequence of persons on socket 7777.
 A person has a sex, first name, last name, day and month of birth.
-For each person, the Lucky People program produces one output, a string on socket 777.
+For each person, the Lucky People program produces one output, a string on socket 7777.
 The string is either True or False, and reflects whether the person is considered lucky.
 A person is lucky when either
 
