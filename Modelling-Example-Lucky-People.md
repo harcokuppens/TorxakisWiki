@@ -15,12 +15,13 @@ A person is lucky when either
 *   the person is a Female after five Males or a Male after five Females.
 
 The input sequence is specified as follows:
+
 | Specification | Structure | Constraints |
 |-|-|-|
 | persons | (person '\n')* ||
 | person | sex separator firstName separator lastName separator dayOfBirth separator monthOfBirth ||
 | separator | '@' ||
-| sex | 'Male' | 'Female' ||
+| sex | 'Male'\|'Female' ||
 | firstName | name ||
 | lastName | name ||
 | name | [A-Z][a-z]* ||
