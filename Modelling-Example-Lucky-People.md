@@ -8,11 +8,11 @@ The Lucky People program gets as input a sequence of persons on socket 7777.
 A person has a sex, first name, last name, day and month of birth.
 For each person, the Lucky People program produces one output, a string on socket 7777.
 The string is either True or False, and reflects whether the person is considered lucky.
-A person is lucky when either
+A person is lucky based on
 
-*   the first character of the first name is equal to the first character of the last name, or
-*   the day of birth is equal to the month of birth, or
-*   the person is a Female after five Males or a Male after five Females.
+*   **Name:** The first character of the first name is equal to the first character of the last name, or
+*   **Birth date:** The day of birth is equal to the month of birth, or
+*   **Gender:** The person is a Female after five Males or a Male after five Females.
 
 The input sequence is specified as follows:
 
