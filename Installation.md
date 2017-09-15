@@ -8,7 +8,7 @@ For windows an installer is provided.
 # Development
 
 To obtain the development version:
-* Clone the github archive.
+* Clone the github archive using the URL https://github.com/TorXakis/TorXakis.git.
 * Install stack
 * Run `stack install` (takes over 1 hour) or `stack install --fast`
 * Install a SMT solver 
