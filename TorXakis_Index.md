@@ -95,7 +95,7 @@
 [Modelling Examples](Modelling_Examples)  
 [Modelling Example - Control Loop](Modelling_Example_Control_Loop)  
 [Modelling Example - Customers Orders](Modelling_Example_Customers_Orders)  
-[Modelling Example - Lucky People](Modelling_Example_Lucky_People)  
+[Modelling Example - Lucky People](Modelling-Example-Lucky-People)  
 [Modelling Example - Shared Memory](Modelling_Example_Shared_Memory)  
 [Modelling Example - Stimulus Response](Modelling_Example_Stimulus_Response)
 

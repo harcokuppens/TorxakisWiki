@@ -1,6 +1,6 @@
 # Modelling Example - Lucky People
 We want to test our [java program](Java_program) [LuckyPeople.java](https://github.com/TorXakis/TorXakis/blob/develop/examps/LuckyPeople/sut/LuckyPeople.java).
-This program gets as input a sequence of persons and determines if those people are lucky. The detailed behaviour of this program can be found at the [assignment page](Modelling_Example_Lucky_People).
+This program gets as input a sequence of persons and determines if those people are lucky. The detailed behaviour of this program can be found at the [assignment page](Modelling-Example-Lucky-People).
 All the files used in this example can be found at [the example folder](https://github.com/TorXakis/TorXakis/tree/develop/examps/LuckyPeople).
 ## Types
 We start with defining the types that are needed to model This program's (our System Under Test - SUT) behaviour.
@@ -30,7 +30,7 @@ Let's implement a [procedure definition](ProcDefs) for this:
 
 "*In*" and "*Out*" are our channels, while "*last*" and "*n*" are the parameters of this procedure. We added the parameters because we want to keep track of how many people of the same sex have been before current person, since it is one of the ways of determining whether a person is lucky.
 
-We want to test our SUT with inputs that make sense, so we should tell TorXakis what makes a Person input sensible. Let's add a function as a constraint for the input:
+We want to test our SUT with inputs that make sense, so we should tell TorXakis what makes a Person input valid. Let's add a function as a constraint for the input:
 
 `In ? p [[ isValid_Person(p) ]]`
 
@@ -40,7 +40,7 @@ Next, we want to communicate to the output whether this person is lucky or not. 
 
 `>-> Out ! isLuckyPerson (p, last, n)`
 
-"*>->*" is the [Sequence Operator](Sequence_Operator). It means that after the process on the left has communicated, the described process behaviour on the right is exposed.
+"**>->**" is the [Sequence Operator](Sequence_Operator). It means that after the process on the left has communicated, the described process behaviour on the right is exposed.
 
 After communicating the result to the output channel, it's time to go back and wait for next input. There's one catch, though: As we said above, we should keep track of how many people with the current sex have been processed so far.
 
@@ -52,8 +52,9 @@ After communicating the result to the output channel, it's time to go back and w
     )
 ```
 
-"*##*" is the [Choice Operator](Choice_Operator). It means that either one of those processes are executed, but never both.
-"*=>>*" is the [Guard Operator](Guard_Operator). The process behaviour on the right is executed only if the expression on the left of it is *true*.
+"**##**" is the [Choice Operator](Choice_Operator). It means that either one of those processes are executed, but never both.
+
+"**=>>**" is the [Guard Operator](Guard_Operator). The process behaviour on the right is executed only if the expression on the left of it is *true*.
 
 So the [process definition](ProcDefs) of Lucky People looks like this:
 ```
@@ -82,7 +83,7 @@ ENDDEF
 ```
 
 ## Functions
-We're not done yet. We need to implement the functions that our "*luckyPeople*" process uses.
+We're not done yet. We need to implement the [function definitions](FuncDefs) that our "*luckyPeople*" process uses.
 ### isValid_Person
 We want to validate the input in order to make sure that it represents data of a person that can actually exist.
 ```
@@ -95,12 +96,37 @@ ENDDEF
 ```
 "*strinre*" function checks whether the given string matches the given Regular Expression. First two lines ensure that only the inputs with Capital case first name and surname are valid.
 ### isLuckyPerson
-To make the "*luckyPerson*" process cleaner, we decided to extract the logic of determining the person's luckiness into a separate function. Here it goes:
+To make the "*luckyPerson*" process cleaner, we decided to extract the logic of determining the person's luckiness into a separate function. As we have seen in the [assignment page](Modelling-Example-Lucky-People), a person can be lucky based on 3 criteria: gender, name or birthday. So our [function definition](FuncDefs) should be something like this:
 ```
 FUNCDEF isLuckyPerson (p :: Person; last :: Sex; n :: Int) :: Bool ::=
-       ( ( sex(p) <> last ) /\ ( n >= 5 ) )                             -- change of sex after 5 of others?
-    \/ ( at(firstName(p), 0 ) == at(lastName(p), 0 ) )                  -- same first character in first and last name?
-    \/ ( dayOfBirth(p) == monthOfBirth(p) )                             -- same value for day and month of birth?
+       isLuckyByGender(p, last, n)
+    \/ isLuckyByName(p)
+    \/ isLuckyByBirthday(p)
+ENDDEF
+```
+Now let's define each of these criteria as separate [function definitions](FuncDefs).
+
+### isLuckyByGender
+A person is lucky by gender if previous 5 people were all from the opposite sex.
+```
+FUNCDEF isLuckyByGender (p :: Person; last :: Sex; n :: Int) :: Bool ::=
+    ( sex(p) <> last ) /\ ( n >= 5 )
+ENDDEF
+```
+
+### isLuckyByName
+A person is lucky by name if both it's name and surname start with the same letter.
+```
+FUNCDEF isLuckyByName (p :: Person) :: Bool ::=
+    at(firstName(p), 0 ) == at(lastName(p), 0 )
+ENDDEF
+```
+
+### isLuckyByBirthday
+A person is lucky by birthday if both day and month of it's birthday are the same.
+```
+FUNCDEF isLuckyByBirthday (p :: Person) :: Bool ::=
+    dayOfBirth(p) == monthOfBirth(p)
 ENDDEF
 ```
 
@@ -158,7 +184,8 @@ TXS >>  PASS
 ```
 ### Testing with predetermined input
 We can also tell TorXakis to use predetermined input data for testing. For this, we can make use of [Test Purpose](TestPurpose)s. We'll define a process that communicates Person data and resulting boolean at each step, then we'll add as many steps as we want for our predetermined input, and then we'll use this process in our Test Purpose.
-Let's define that process and write some test data with expected results:
+
+Let's create a _PurposeExamples.txs_ file and define that process and write some test data with expected results:
 ```
 PROCDEF examples [ In :: Person; Out :: Bool ] () HIT ::=
         In ! Person( Male, "Mickey", "Mouse", 13, 1 )
@@ -210,7 +237,7 @@ PURPDEF PurposeExamples ::=
     GOAL examples ::= examples [In,Out] ()
 ENDDEF
 ```
-Defining the Goal of the Test Purpose with *examples* process effectively forces the Persons in *examples* process to be communicated through *In* channel to *Model* and expects the output in *Out* channel to match whatever is defined in *examples* process.
+Defining the Goal of the Test Purpose with *examples* process effectively forces the Persons in *examples* process to be communicated through *In* channel to *SUT* and expects the output in *Out* channel to match whatever is defined in *examples* process.
 
 Now we can use this Test Purpose to test SUT with our predetermined inputs.
 
@@ -218,11 +245,11 @@ Now we can use this Test Purpose to test SUT with our predetermined inputs.
 
 `$> java LuckyPeople`
 
-2.  Start TorXakis: run the [TorXakis](TorXakis) with the LuckyPeople model described above in another command window.
+2.  Start TorXakis: run the [TorXakis](TorXakis) with the LuckyPeople model and PurposeExamples test purpose in another command window.
 
-`$> torxakis LuckyPeople.txs`
+`$> torxakis LuckyPeople.txs PurposeExamples.txs`
 
-3.  Set the Model and SUT for testing: In TorXakis type the following commands:
+3.  Set the Model, Test Purpose and SUT for testing: In TorXakis type the following commands:
 
 `tester Model PurposeExamples Sut`
 
@@ -283,38 +310,92 @@ TXS >>  Goal examples: Hit
 TXS >>  PASS
 ```
 ### Lucky based on gender
-One of the situations that makes a person lucky is when that person's sex is different from previous 5 people. Even though our predetermined inputs cover this case, this criteria comes with implied cases that:
+One of the situations that makes a person lucky is when that person's sex is different from previous 5 people. Even though our predetermined inputs cover this case, this criteria comes with implied conditions that:
 
-- if _less than 5_ previous persons are of the other sex then the current person **is not lucky**
-- if _more than 5_ previous persons are of the other sex then the current person **is lucky**
+- if **less than 5** previous persons are of the opposite sex then the current person _is not lucky_
+- if **more than 5** previous persons are of the opposite sex then the current person _is lucky_
 
-Covering all these cases with predetermined input is not only not practical but also defeats the purpose of using TorXakis for Model Based Testing. We should make TorXakis to test these situations while still generating test data randomly. We can do it by using a Test Purpose that only enforces the sex of generated Person data and leaves the rest to be generated by TorXakis.
+Covering every possible case that is implied by above conditions by using predetermined input is not only not practical but also defeats the purpose of using TorXakis for Model Based Testing. We should make TorXakis test these situations while still generating test data randomly. We can do it by using a Test Purpose that only enforces the sex of generated Person data and leaves the rest to be generated by TorXakis.
 
-Here is such a [Process Definition](ProcDefs) that can be used here:
+Let's create a _PurposeLuckyByGender.txs_ file and define the process and the Test Purpose in it.
+
+#### The process
+Here is such a [Process Definition](ProcDefs) that can be used for this purpose:
 ```
-PROCDEF increasingRows [ In :: Person; Out :: Bool ] ( length, pos :: Int; s :: Sex ) HIT ::=
-        In ? p [[ sex(p) == s]]
-    >-> Out ? b
-    >-> (
-                [[pos == 1]] =>> (
-                                        [[ isMale(s) ]] =>> increasingRows [In,Out] (length, length, Female)
-                                    ##
-                                        [[ isFemale(s) ]] =>> increasingRows [In,Out] (length+1, length+1, Male)
-                                 )
+PROCDEF repeatAndSwitchGender [ In :: Person ; Out :: Bool ] ( pos, length :: Int; s :: Sex) HIT ::=
+        (
+            [[ pos > 1 ]] =>> In ? p [[ sex(p) == s ]] >-> EXIT
             ##
-                [[pos>1]] =>> increasingRows [In,Out] (length, pos-1, s)
-         )
+            [[ pos == 1 ]] =>> In ? p [[ (sex(p) == s)
+                                        /\ ( not (isLuckyByName(p)))
+                                        /\ ( not (isLuckyByBirthday(p)))
+                                      ]] >-> EXIT
+        )
+        >>> Out ? b
+        >-> (
+                [[pos == length ]] =>> (
+                                         [[ isMale(s) ]] =>> repeatAndSwitchGender [In,Out] (1, length, Female)
+                                       ##
+                                         [[ isFemale(s) ]] =>> repeatAndSwitchGender [In,Out] (1, length+1, Male)
+                                       )
+                ##
+                [[pos < length ]] =>> repeatAndSwitchGender [In, Out] (pos+1,length, s)
+            )
 ENDDEF
 ```
-This process enforces repeating the same sex for a number of times, for both sexes, then increments the repetition number and repeats. There's no upper limit defined for the repetition number, so as long as we run TorXakis the generated persons' sexes will be like this: *MFMMFFMMMFFFMMMMFFFF*...
+Let's walk through this [Process Definition](ProcDefs) step by step.
 
-Let's write a Test Purpose that uses *incresingRows* process to manipulate test data generated by TorXakis:
+First block in paranthesis `**(...)**` enforces the criteria on the person data that is communicated through **In** channel:
 ```
-PURPDEF PurposeIncreasingRows ::=
+(
+    [[ pos > 1 ]] =>> In ? p [[ sex(p) == s ]] >-> EXIT
+    ##
+    [[ pos == 1 ]] =>> In ? p [[ (sex(p) == s)
+                                /\ ( not (isLuckyByName(p)))
+                                /\ ( not (isLuckyByBirthday(p)))
+                              ]] >-> EXIT
+)
+```
+If current person _is not_ the first person of current gender (position counter is greater than 1) then we just enforce that its gender is the sex that is passed in as parameter.
+
+If current person _is_ the first person of current gender (position counter is 1) then we enforce not only that its gender is the sex that is passed in as parameter, but also that this person is not lucky based on other criteria. Because, with this purpose, we want to observe whether the current person is going to be deemed lucky based on the number of people who came before consecutively with opposite sex. E.g. if a Female comes after 6 consecutive Males and is evaluated to be lucky, we want to be sure that it is because of her gender and not her name or birthday.
+
+"**##**" is the [Choice Operator](Choice_Operator). It means that either one of those processes are executed, but never both.
+
+"**EXIT**" keywords at the end of both processes are needed to signal exiting the block defined in paranthesis.
+
+`>>> Out ? b`
+
+This line just reads from the **Out** channel into _b_ variable. This variable is not going to be used, but it has to be defined since the Test Purpose has to define what should be done with all the channels.
+
+"**>>>**" is the [Enable Operator](Enable_Operator). It means that the flow synchronizes on EXIT of multiple processes. Here it signals the continuation after exiting the previous block.
+
+Next block in paranthesis "**()**" enforces repeating the same sex for a number of times, for both sexes, then increments the repetition number and repeats:
+```
+(
+    [[pos == length ]] =>> (
+                             [[ isMale(s) ]] =>> repeatAndSwitchGender [In,Out] (1, length, Female)
+                           ##
+                             [[ isFemale(s) ]] =>> repeatAndSwitchGender [In,Out] (1, length+1, Male)
+                           )
+    ##
+    [[pos < length ]] =>> repeatAndSwitchGender [In, Out] (pos+1,length, s)
+)
+```
+If current position counter (_pos_) reached the requested _length_, then switch the genders. We start with Males, so after having requested number (_length_) of Males in a row, it's time to request the same number of Females. After having the same number of Females, switch back to Males and increment the requested _length_.
+
+If current position counter (_pos_) is still below the requested _length_, then just increment the position counter and request another person of the same sex with previous person.
+
+There's no upper limit defined for the repetition number (_length_), so as long as we run TorXakis the generated persons' genders will be like this: *MFMMFFMMMFFFMMMMFFFF*...
+
+#### The Test Purpose
+Let's write a Test Purpose that uses *repeatAndSwitchGender* process to manipulate test data generated by TorXakis:
+```
+PURPDEF PurposeLuckyByGender ::=
     CHAN IN    In 
     CHAN OUT   Out
-    
-    GOAL increasingRows ::= increasingRows [In,Out] (1,1,Male)
+
+    GOAL luckyByGender ::= repeatAndSwitchGender [In,Out] (1,1,Male)
 ENDDEF
 ```
 Now we can use this Test Purpose to test SUT for various "Lucky by gender" cases.
@@ -323,13 +404,13 @@ Now we can use this Test Purpose to test SUT for various "Lucky by gender" cases
 
 `$> java LuckyPeople`
 
-2.  Start TorXakis: run the [TorXakis](TorXakis) with the LuckyPeople model described above in another command window.
+2.  Start TorXakis: run the [TorXakis](TorXakis) with the LuckyPeople model and PurposeLuckyByGender test purpose in another command window.
 
-`$> torxakis LuckyPeople.txs`
+`$> torxakis LuckyPeople.txs PurposeLuckyByGender.txs`
 
-3.  Set the Model and SUT for testing: In TorXakis type the following commands:
+3.  Set the Model, Test Purpose and SUT for testing: In TorXakis type the following commands:
 
-`tester Model PurposeIncreasingRows Sut`
+`tester Model PurposeLuckyByGender Sut`
 
 4.  Test the SUT with random data, ensuring coverage of "Lucky by gender" cases. Let's say we test for repetitions of 1 to 10 i.e.:
 
@@ -405,10 +486,7 @@ TXS >>  ...299: IN: Act { { ( In, [ Person(Male,"M","P",23,6) ] ) } }
 TXS >>  ...300: OUT: Act { { ( Out, [ False ] ) } }
 TXS >>  PASS
 ```
-Two points for attention:
-
-- In our **increasingRows** process we didn't have to tell TorXakis that after switching the gender the next person has to be lucky on unlucky; we just enforced a certain sex to be assigned to current person. TorXakis knows what each person's luckiness output should be depending on the **Model**.
-- Since we do not manipulate other data of persons, it is possible that a person which should be lucky based on gender is actually lucky due to some other condition. This does nullify our aim, but we ignore such cases for now. What we are sure about, though, is that a person who comes after 5+ people from the opposite gender is *always* lucky. On the other hand, it's possible to ensure that such people are *only* lucky by gender with a more complex *increasingRows* process.
+Point for attention: In our **repeatAndSwitchGender** process we didn't have to tell TorXakis that after switching the gender the next person has to be lucky on unlucky; we just enforced a certain sex to be assigned to current person. TorXakis knows what each person's luckiness output should be depending on the **Model**.
 
 ## XML-Based communication
 TorXakis is capable of XML-based communication with SUT's. We don't have an SUT which does that but TorXakis can help us there, too: TorXakis can also act as a simulator which behaves based on a model.
