@@ -184,4 +184,4 @@ ENDDEF
 ```
 This Test Purpose will run until `someProcess` process in the `usage` performs Read accesses with "Final" identity and each of the given values (1,2 and 3), or given number of steps are performed by TorXakis.
 
-A sample implementation can be found in the example [ReadWriteConflictAdvanced](https://github.com/TorXakis/TorXakis/blob/develop/examps/ReadWriteConflict/ReadWriteAdvanced.txs).
+A sample implementation can be found in the example [ReadWriteTestPurposes](https://github.com/TorXakis/TorXakis/blob/develop/examps/ReadWriteConflict/ReadWriteTestPurposes.txs).
