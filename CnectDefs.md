@@ -155,7 +155,7 @@ specifies a socket connection, called `Sim`, to the outside world, where
 *   there is one incoming and one outgoing channel, `Action` and `Result`, respectively;
 *   the channel mappings are the inverse of the previous connection definition, implying that this connection can be used for a simulator simulating the same model as used above for testing.
 
-##technical details
+## Technical Details
 
 * Socket streams must have UTF-8 string encoding, without byte order mark. 
 * The new line format must be Linux (\n). When using the Windows style (\r\n) the \r is considered part of the output string.
