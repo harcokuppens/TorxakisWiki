@@ -70,26 +70,6 @@ TorXakis has the following predefined functions; grouped by predefined data type
 
 <tr>
 
-<td>isFalse(b :: Bool) :: Bool  
-</td>
-
-<td>is False function -- TODO: decide remove since is equal to not?  
-</td>
-
-</tr>
-
-<tr>
-
-<td>isTrue(b :: Bool) :: Bool  
-</td>
-
-<td>is True function -- TODO: decide remove since is equal to its input b?  
-</td>
-
-</tr>
-
-<tr>
-
 <td>not(b :: Bool) :: Bool  
 </td>
 
