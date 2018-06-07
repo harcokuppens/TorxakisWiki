@@ -37,4 +37,4 @@ The expressions `expr2` and `expr3` are only evaluated after the value of `expr1
 For Boolean expressions in which the order of evaluation is irrelevant, one could consider the [equivalent alternatives](https://en.wikipedia.org/wiki/Conditioned_disjunction):
 * (`expr1` => `expr2`) /\ (not(`expr1`) => `expr3`) 
 or
-* (`expr1` /\ `expr2`) \/ (not(`expr1`) /\ `expr3`)
+* (`expr1` /\ `expr2`) \\/ (not(`expr1`) /\ `expr3`)
