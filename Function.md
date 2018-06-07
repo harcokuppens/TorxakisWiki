@@ -262,7 +262,7 @@ TorXakis has the following predefined functions; grouped by predefined data type
 
 <tr>
 
-<td><(a,b :: Int) ::= Bool  
+<td>&lt;(a,b :: Int) ::= Bool  
 </td>
 
 <td>Less Then Infix operator  
