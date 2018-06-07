@@ -15,7 +15,7 @@
 <td>iteValExpr  
 </td>
 
-<td>"IF" [valExpr](ValExpr) "THEN" [valExpr](ValExpr) "ELSE" [valExpr](ValExpr) "FI"  
+<td>"IF" [[ValExpr]] "THEN" [[ValExpr]] "ELSE" [[ValExpr]] "FI"  
 </td>
 
 </tr>
