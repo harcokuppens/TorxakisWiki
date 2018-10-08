@@ -368,10 +368,8 @@ TorXakis has the following predefined functions; grouped by predefined data type
 </td>
 
 <td>Character at position i of s.  
-The index of position starts at 0\.  
-**Note** at is a [partial function](http://cvc4.cs.nyu.edu/wiki/Strings#Partial_Functions).  
-To achieve a desirable solution, also guard proper conditions,  
-i.e., add assertions to enforce: (i >= 0) /\ (i < len(s))  
+The index of position starts at 0.
+When the index is out of range (either i < 0 or i > len(s)) the empty string ("") will be returned.  
 </td>
 
 </tr>
