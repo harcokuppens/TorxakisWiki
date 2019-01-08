@@ -25,8 +25,8 @@ The statement
 
 describes the process that
 
-*   first communicates variable `x` over `Channel1_Int`
-*   and next communicates the same variable on `Channel2_Int`
+*   first communicates over `Channel1_Int` (the value can be referred to as variable `x`)
+*   and next communicates the value of variable `x` on `Channel2_Int`
 
 The statement  
 
@@ -35,5 +35,5 @@ The statement
 
 describes the process that
 
-*   first simultaneously communicates variable `x` over `Channel1_Int` and variable `y` over `Channel2_Int`
+*   first simultaneously communicates over `Channel1_Int` and `Channel2_Int` (the values can be referred to as variable `x` over variable `y`, respectively)
 *   and next instantiates the process `P` with `Channel3_Int` as channel and the value of the variables `x` and `y` as arguments.
