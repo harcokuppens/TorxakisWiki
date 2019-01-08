@@ -12,7 +12,7 @@
 
 ## Semantics[¶](#Semantics)
 
-After the process has communicated, the described process behaviour is exposed.
+After the communications have occurred (in a single step), the described process behaviour is exposed.
 
 <a name="Examples"></a>
 
