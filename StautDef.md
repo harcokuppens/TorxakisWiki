@@ -39,7 +39,7 @@
 <td>transition  
 </td>
 
-<td>statename "->" [Communications](Communications) "{" update* "}" "->" stateName  
+<td>statename "->" [Communications](Communications) ("{" update "}")* "->" stateName  
 </td>
 
 </tr>
