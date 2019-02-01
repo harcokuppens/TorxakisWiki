@@ -4,11 +4,11 @@
 
 |Term | Explanation |
 |---|---|
-| purpDef | "PURPDEF" purpName "::=" "CHAN" "IN" neChannelNameList? "CHAN" "OUT" neChannelNameList? goals "ENDDEF" |
+| purpDef | "PURPDEF" purpName "::=" "CHAN" "IN" neChannelNameList? "CHAN" "OUT" neChannelNameList? neGoals "ENDDEF" |
 | neChannelNameList | channelName ("," channelName)* |
 | modelName | [CapsId](CapsId) |
 | channelName | [CapsId](CapsId) |
-| goals | goal (, goal)* |
+| neGoals | goal (, goal)* |
 | goal | "GOAL" goalName "::=" [processBehaviour](ProcessBehaviour) |
 
 ## Semantics
