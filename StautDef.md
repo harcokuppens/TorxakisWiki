@@ -27,7 +27,7 @@
 
 <td>( "STATE" stateName  
 | "VAR" neVarDeclList?  
-| "INIT" stateName update*  
+| "INIT" stateName ("{" neUpdate "}")?
 | "TRANS" transition+  
 )  
 </td>
@@ -39,7 +39,16 @@
 <td>transition  
 </td>
 
-<td>statename "->" [Communications](Communications) ("{" update "}")* "->" stateName  
+<td>statename "->" [Communications](Communications) ("{" neUpdate "}")? "->" stateName  
+</td>
+
+</tr>
+<tr>
+
+<td>neUpdate  
+</td>
+
+<td>neUpdate ":=" update (";" update)*
 </td>
 
 </tr>
@@ -49,7 +58,7 @@
 <td>update  
 </td>
 
-<td>varName+ ":=" [valExpr](ValExpr)  
+<td>varName ":=" [valExpr](ValExpr)  
 </td>
 
 </tr>
