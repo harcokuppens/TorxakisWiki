@@ -60,6 +60,28 @@
 
 </tr>
 
+
+<tr>
+
+<td>funcName  
+</td>
+
+<td>[SmallId](https://github.com/harcokuppens/TorxakisWiki/SmallId)  
+</td>
+
+</tr>
+
+<tr>
+
+<td>funcName  
+</td>
+
+<td>[SmallId](https://github.com/harcokuppens/TorxakisWiki/SmallId.md)  
+</td>
+
+</tr>
+
+
 <tr>
 
 <td>funcName  
