@@ -65,7 +65,7 @@
 <td>funcName  
 </td>
 
-<td>[SmallId](SmallId)  
+<td>[SmallId](./SmallId.md)  
 </td>
 
 </tr>
@@ -75,7 +75,7 @@
 <td>varName  
 </td>
 
-<td>[SmallId](SmallId)  
+<td>[[SmallId|SmallId]]  
 </td>
 
 </tr>
