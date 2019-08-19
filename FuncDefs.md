@@ -85,7 +85,7 @@
 <td>typeName  
 </td>
 
-<td>[CapsId](CapsId)  
+<td>[CapsId](CapsId.md)  
 </td>
 
 </tr>
