@@ -1,3 +1,13 @@
+[SmallId](./SmallId.md)  
+<br>
+[[SmallId|SmallId]]  
+<br>
+[CapsId](CapsId.md)  
+<br>
+[CapsId](CapsId)  
+
+
+
 <a name="Function-Defintions"></a>
 
 # Function Defintions[¶](#Function-Defintions)
@@ -5,6 +15,30 @@
 <a name="Syntax"></a>
 
 ## Syntax[¶](#Syntax)
+
+convert html table to markdown 
+
+|                       |                                                                                  |
+| --------------------- | -------------------------------------------------------------------------------- |
+| funcDefs              | "FUNCDEF" funcDef (";" funcDef)\* "ENDDEF"                                       |
+| funcDef               | funcName "(" neVarsDeclarationList? ")" "::" typeName "::=" \[valExpr\](ValExpr) |
+| neVarsDeclarationList | varsDeclaration (";" varsDeclaration )\*                                         |
+| varsDeclaration       | neVarNameList "::" typeName                                                      |
+| neVarNameList         | varName ("," varName )\*                                                         |
+| funcName              | [SmallId](./SmallId.md)                                                        |
+| varName               | [[SmallId|SmallId]]                                                           |
+| varName               | [[SmallId|SmallId.md]]                                                           |
+| typeName              | [CapsId](CapsId.md)                                                            |
+| funcName              | [SmallId](https://github.com/harcokuppens/TorxakisWiki/SmallId.md)             |
+| funcName              | [SmallId](https://github.com/harcokuppens/TorxakisWiki/wiki/SmallId.md)        |
+| funcName              | [SmallId](https://github.com/harcokuppens/TorxakisWiki/wiki/SmallId)          |
+| funcName              | [SmallId](https://github.com/harcokuppens/Torxakissfdsf)          |
+| typeName              | [CapsId](CapsId)        
+
+
+## Syntax[¶](#Syntax)
+
+try fixing within html table
 
 <table>
 
@@ -19,6 +53,27 @@
 </td>
 
 </tr>
+
+<tr>
+
+<td>funcName  
+</td>
+
+<td>[SmallId](https://github.com/harcokuppens/TorxakisWiki/SmallId.md)  
+</td>
+
+</tr>
+
+<tr>
+
+<td>funcName  
+</td>
+
+<td>[SmallId](https://github.com/harcokuppens/TorxakisWiki/wiki/SmallId.md)  
+</td>
+
+</tr>
+
 
 <tr>
 
@@ -60,28 +115,6 @@
 
 </tr>
 
-
-<tr>
-
-<td>funcName  
-</td>
-
-<td>[SmallId](https://github.com/harcokuppens/TorxakisWiki/SmallId)  
-</td>
-
-</tr>
-
-<tr>
-
-<td>funcName  
-</td>
-
-<td>[SmallId](https://github.com/harcokuppens/TorxakisWiki/SmallId.md)  
-</td>
-
-</tr>
-
-
 <tr>
 
 <td>funcName  
@@ -108,6 +141,28 @@
 </td>
 
 <td>[CapsId](CapsId.md)  
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>typeName  
+</td>
+
+<td>
+[CapsId](CapsId)  
+</td>
+
+</tr>
+
+
+<td>typeName  
+</td>
+
+<td>
+<a href="CapsId">CapsId</a>  
 </td>
 
 </tr>
@@ -166,3 +221,4 @@ Definition of multiple functions in a single FUNCDEF block.
    min ( x, y :: Int ) :: Int ::= IF (x < y) THEN x ELSE y FI
 ENDDEF
 </pre>
+
